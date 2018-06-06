@@ -24,8 +24,11 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class ExpenseDetailActivity extends AppCompatActivity  {
 
@@ -231,6 +234,12 @@ public class ExpenseDetailActivity extends AppCompatActivity  {
 
 
     void mSave() {
+
+        String str_date=txtDate.getText().toString();
+        //ShowToast(FuncHelper.StringToDate(str_date).toString());
+
+
+
 
         try {
 

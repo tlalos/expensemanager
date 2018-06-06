@@ -14,7 +14,7 @@ public class DBHelper  extends SQLiteOpenHelper {
     private Context mContext;
 
     public DBHelper(Context context) {
-        super(context, "expenses_app2.db", null,14);
+        super(context, "expenses_app2.db", null,16);
         mContext=context;
     }
 

@@ -3,6 +3,7 @@ package com.example.tlalos.myapplication;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
@@ -124,10 +125,17 @@ public class FuncHelper {
 
     public static String RetSpinnerSelectedValue(Spinner mSpinner,String mField) {
 
-        Cursor cursor = (Cursor) mSpinner.getSelectedItem();
-        String val = cursor.getString(cursor.getColumnIndex(mField));
+        String val="";
+        try {
+            Cursor cursor = (Cursor) mSpinner.getSelectedItem();
+            val = cursor.getString(cursor.getColumnIndex(mField));
+            } catch (Exception e) {
+            // Catch block
+        }
+
 
         return val;
+
     }
 
     public static void SetSpinnerSelectedValue(Spinner mSpinner,String mKeyField,String mKeyValue) {

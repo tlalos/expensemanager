@@ -98,6 +98,8 @@ public class MainActivity extends AppCompatActivity {
 
                 Cursor c = (Cursor)parent.getItemAtPosition(position);
                 String cyear = c.getString(c.getColumnIndexOrThrow("cyear"));
+
+                UpdateListView();
                 ShowToast("SELECTED YEAR:"+cyear);
 
 
@@ -121,6 +123,8 @@ public class MainActivity extends AppCompatActivity {
 
                 Cursor c = (Cursor)parent.getItemAtPosition(position);
                 String cmonth = c.getString(c.getColumnIndexOrThrow("cmonth"));
+
+                UpdateListView();
                 ShowToast("SELECTED MONTH:"+cmonth);
 
             }
@@ -180,10 +184,16 @@ public class MainActivity extends AppCompatActivity {
 
         try {
 
+        String selectedYear=FuncHelper.RetSpinnerSelectedValue(cmbYear,"cyear");
+        String selectedMonth=FuncHelper.RetSpinnerSelectedValue(cmbMonth,"cmonth");
+
 
         String mSQL="SELECT e._id,e.comments,e.cdate,coalesce(e.value,0) as expensevalue,et.descr as expensedescr "+
                     "FROM expenses e "+
                     "left join expensetype et on et.codeid=e.expensecodeid "+
+                    "where "+
+                    "cyear="+selectedYear+" and "+
+                    "cmonth="+selectedMonth+" "+
                     "order by e._id desc";
         todoCursor = db.rawQuery(mSQL, null);
         todoAdapter = new TodoCursorAdapter(this, todoCursor);
@@ -222,6 +232,8 @@ public class MainActivity extends AppCompatActivity {
 
                 FuncHelper.SetSpinnerSelectedValue(cmbYear,"cyear",pyear);
                 FuncHelper.SetSpinnerSelectedValue(cmbMonth,"cmonth",pmonth);
+
+                UpdateListView();
 
 
 

@@ -306,7 +306,7 @@ public class ExpenseDetailActivity extends AppCompatActivity  {
 
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
-            case R.id.home:
+            case android.R.id.home:
                 finish();
                 return true;
             case R.id.expense_detail_menu_save_option:

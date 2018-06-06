@@ -14,7 +14,7 @@ public class DBHelper  extends SQLiteOpenHelper {
     private Context mContext;
 
     public DBHelper(Context context) {
-        super(context, "expenses_app2.db", null,13);
+        super(context, "expenses_app2.db", null,14);
         mContext=context;
     }
 
@@ -46,7 +46,8 @@ public class DBHelper  extends SQLiteOpenHelper {
         ShowToast("ON UPGRADE");
         onCreate(db);
 
-        //mCreateDBField(db,"expenses","cdate","text");
+        mCreateDBField(db,"expenses","cmonth","integer");
+        mCreateDBField(db,"expenses","cyear","integer");
 
 
 

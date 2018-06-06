@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         DBHelper dbHelper=new DBHelper(getApplicationContext());
         db=dbHelper.getReadableDatabase();
 
+
         //load pickers
         LoadPickers();
 

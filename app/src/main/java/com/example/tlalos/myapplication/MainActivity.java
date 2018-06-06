@@ -52,19 +52,12 @@ public class MainActivity extends AppCompatActivity {
         DBHelper dbHelper=new DBHelper(getApplicationContext());
         db=dbHelper.getReadableDatabase();
 
-        //load picker
-        final Cursor cursor = db.rawQuery("SELECT  * FROM expensetype", null);
-        if(cursor.getCount()>0){
-            String[] from = new String[]{"descr"};
-            // create an array of the display item we want to bind our data to
-            int[] to = new int[]{android.R.id.text1};
-            SimpleCursorAdapter mAdapter = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item,
-                    cursor, from, to,1);
-            mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            cmbYear.setAdapter(mAdapter);
-            cmbMonth.setAdapter(mAdapter);
+        //load pickers
+        LoadPickers();
 
-        }
+        FuncHelper.SetSpinnerSelectedValue(cmbYear,"cyear",Integer.toString(FuncHelper.GetCurrentYear()));
+        FuncHelper.SetSpinnerSelectedValue(cmbMonth,"cmonth",Integer.toString(FuncHelper.GetCurrentMonth()));
+
 
 
 
@@ -92,6 +85,40 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+        cmbYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                Cursor c = (Cursor)parent.getItemAtPosition(position);
+                String cyear = c.getString(c.getColumnIndexOrThrow("cyear"));
+                ShowToast("SELECTED YEAR:"+cyear);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+        cmbMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                Cursor c = (Cursor)parent.getItemAtPosition(position);
+                String cmonth = c.getString(c.getColumnIndexOrThrow("cmonth"));
+                ShowToast("SELECTED MONTH:"+cmonth);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+
 
 
         FloatingActionButton fabAddNew;
@@ -111,6 +138,14 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+
+    }
+
+    void LoadPickers() {
+        FuncHelper.LoadSpinner(cmbYear,this,"SELECT _id,cyear FROM expenses group by cyear order by cyear desc","cyear");
+
+        FuncHelper.LoadSpinner(cmbMonth,this,"SELECT _id,cmonth FROM expenses group by cmonth order by cmonth asc","cmonth");
 
 
     }
@@ -148,6 +183,18 @@ public class MainActivity extends AppCompatActivity {
 
                 //enimerose to listview
                 UpdateListView();
+
+
+                //keep old values
+                String pyear=FuncHelper.RetSpinnerSelectedValue(cmbYear,"cyear");
+                String pmonth=FuncHelper.RetSpinnerSelectedValue(cmbMonth,"cmonth");
+                //load pickers
+                LoadPickers();
+
+
+                FuncHelper.SetSpinnerSelectedValue(cmbYear,"cyear",pyear);
+                FuncHelper.SetSpinnerSelectedValue(cmbMonth,"cmonth",pmonth);
+
 
             }
         }

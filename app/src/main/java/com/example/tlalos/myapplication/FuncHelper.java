@@ -1,5 +1,11 @@
 package com.example.tlalos.myapplication;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.widget.SimpleCursorAdapter;
+import android.widget.Spinner;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,6 +21,29 @@ public class FuncHelper {
         String strDate = mdformat.format(calendar.getTime());
         return strDate;
     }
+
+
+    public static int GetCurrentMonth() {
+        Calendar calendar = Calendar.getInstance();
+
+        return GetMonth(calendar.getTime());
+    }
+
+
+    public static int GetCurrentDay() {
+        Calendar calendar = Calendar.getInstance();
+
+        return GetDay(calendar.getTime());
+    }
+
+
+    public static int GetCurrentYear() {
+        Calendar calendar = Calendar.getInstance();
+
+        return GetYear(calendar.getTime());
+    }
+
+
 
     public static Date StringToDate(String mDate){
 
@@ -66,6 +95,56 @@ public class FuncHelper {
         cal.setTime(mDate);
         return cal.get(Calendar.YEAR);
     }
+
+
+    public static SimpleCursorAdapter LoadSpinner(Spinner Picker, Context mContext,String mQuery,String mViewField) {
+
+        DBHelper dbHelper=new DBHelper(mContext);
+        SQLiteDatabase db=dbHelper.getReadableDatabase();
+
+
+        final Cursor cursor = db.rawQuery(mQuery, null);
+        SimpleCursorAdapter mAdapter=null;
+
+        if(cursor.getCount()>0){
+            String[] from = new String[]{mViewField};
+            // create an array of the display item we want to bind our data to
+            int[] to = new int[]{android.R.id.text1};
+            mAdapter = new SimpleCursorAdapter(mContext, android.R.layout.simple_spinner_item,
+                    cursor, from, to,1);
+            mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            Picker.setAdapter(mAdapter);
+
+        }
+
+        return mAdapter;
+
+    }
+
+
+    public static String RetSpinnerSelectedValue(Spinner mSpinner,String mField) {
+
+        Cursor cursor = (Cursor) mSpinner.getSelectedItem();
+        String val = cursor.getString(cursor.getColumnIndex(mField));
+
+        return val;
+    }
+
+    public static void SetSpinnerSelectedValue(Spinner mSpinner,String mKeyField,String mKeyValue) {
+
+        for (int i = 0; i < mSpinner.getCount(); i++) {
+            Cursor value = (Cursor) mSpinner.getItemAtPosition(i);
+            String mCurValue = value.getString(value.getColumnIndex(mKeyField));
+
+            //if (mCurValue == mValue) {
+            if (mCurValue.equals(mKeyValue)){
+                mSpinner.setSelection(i);
+                return;
+            }
+        }
+
+    }
+
 
 
 }

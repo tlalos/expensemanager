@@ -26,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
 
     private TodoCursorAdapter todoAdapter=null;
     private Cursor todoCursor=null;
+    private Boolean bypassComboYearOnSelect=false;
+    private Boolean bypassComboMonthOnSelect=false;
 
     ListView lvItems;
     Spinner cmbYear;
@@ -89,9 +91,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
+                if (bypassComboYearOnSelect==true) {
+                    bypassComboYearOnSelect=false;
+                    return;
+                }
+
                 Cursor c = (Cursor)parent.getItemAtPosition(position);
                 String cyear = c.getString(c.getColumnIndexOrThrow("cyear"));
                 ShowToast("SELECTED YEAR:"+cyear);
+
+
             }
 
             @Override
@@ -104,6 +113,11 @@ public class MainActivity extends AppCompatActivity {
         cmbMonth.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if (bypassComboMonthOnSelect==true) {
+                    bypassComboMonthOnSelect=false;
+                    return;
+                }
 
                 Cursor c = (Cursor)parent.getItemAtPosition(position);
                 String cmonth = c.getString(c.getColumnIndexOrThrow("cmonth"));
@@ -142,6 +156,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    void DisablePickerOnListener(Spinner mSpinner) {
+
+        AdapterView.OnItemSelectedListener onItemSelectedListener = mSpinner.getOnItemSelectedListener();
+        mSpinner.setOnItemSelectedListener(null);
+        mSpinner.setSelection(0);
+        mSpinner.setOnItemSelectedListener(onItemSelectedListener);
+
+    }
+
     void LoadPickers() {
         FuncHelper.LoadSpinner(cmbYear,this,"SELECT _id,cyear FROM expenses group by cyear order by cyear desc","cyear");
 
@@ -150,6 +174,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    
     void UpdateListView() {
 
         try {
@@ -185,6 +211,8 @@ public class MainActivity extends AppCompatActivity {
                 UpdateListView();
 
 
+                bypassComboYearOnSelect=true;
+                bypassComboMonthOnSelect=true;
                 //keep old values
                 String pyear=FuncHelper.RetSpinnerSelectedValue(cmbYear,"cyear");
                 String pmonth=FuncHelper.RetSpinnerSelectedValue(cmbMonth,"cmonth");
@@ -194,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
 
                 FuncHelper.SetSpinnerSelectedValue(cmbYear,"cyear",pyear);
                 FuncHelper.SetSpinnerSelectedValue(cmbMonth,"cmonth",pmonth);
+
 
 
             }

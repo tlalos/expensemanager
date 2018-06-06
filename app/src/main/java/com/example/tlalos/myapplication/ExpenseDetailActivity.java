@@ -235,10 +235,8 @@ public class ExpenseDetailActivity extends AppCompatActivity  {
 
     void mSave() {
 
-        String str_date=txtDate.getText().toString();
-        //ShowToast(FuncHelper.StringToDate(str_date).toString());
-
-
+        int mMonth=FuncHelper.GetMonth(FuncHelper.StringToDate(txtDate.getText().toString()));
+        int mYear=FuncHelper.GetYear(FuncHelper.StringToDate(txtDate.getText().toString()));
 
 
         try {
@@ -250,6 +248,8 @@ public class ExpenseDetailActivity extends AppCompatActivity  {
                 mSQL="update expenses "+
                      "set "+
                      "cdate='"+txtDate.getText()+"',"+
+                     "cyear='"+mYear+"',"+
+                     "cmonth='"+mMonth+"',"+
                      "expensecodeid='"+mExpendId+"',"+
                      "value='"+txtValue.getText()+"',"+
                      "comments='"+txtComments.getText()+"' "+
@@ -259,10 +259,12 @@ public class ExpenseDetailActivity extends AppCompatActivity  {
             {
 
                 mSQL="insert into expenses " +
-                        "(cdate,expensecodeid,value, comments) "+
+                        "(cdate,cyear,cmonth,expensecodeid,value, comments) "+
                         "values "+
                         "("+
                         "'"+txtDate.getText()+"'," +
+                        "'"+mYear+"'," +
+                        "'"+mMonth+"'," +
                         "'"+mExpendId+"'," +
                         "'"+txtValue.getText()+"'," +
                         "'"+txtComments.getText()+"'" +

@@ -50,7 +50,7 @@ public class FuncHelper {
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(mDate);
-        return cal.get(Calendar.MONTH);
+        return cal.get(Calendar.MONTH)+1;
     }
 
     public static int GetDay(Date mDate) {

@@ -137,10 +137,13 @@ public class FuncHelper {
             String mCurValue = value.getString(value.getColumnIndex(mKeyField));
 
             //if (mCurValue == mValue) {
-            if (mCurValue.equals(mKeyValue)){
-                mSpinner.setSelection(i);
-                return;
+            if (mCurValue!=null){
+                if (mCurValue.equals(mKeyValue)){
+                    mSpinner.setSelection(i);
+                    return;
+                }
             }
+
         }
 
     }

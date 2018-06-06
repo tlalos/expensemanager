@@ -14,6 +14,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 
@@ -26,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
     private Cursor todoCursor=null;
 
     ListView lvItems;
+    Spinner cmbYear;
+    Spinner cmbMonth;
     SQLiteDatabase db=null;
     Context mContext;
 
@@ -40,23 +44,29 @@ public class MainActivity extends AppCompatActivity {
 
         mContext=getApplicationContext();
 
+        cmbYear= (Spinner) findViewById(R.id.cmbMainYear);
+        cmbMonth= (Spinner) findViewById(R.id.cmbMainMonth);
+
+
         //ShowToast("START");
         DBHelper dbHelper=new DBHelper(getApplicationContext());
         db=dbHelper.getReadableDatabase();
 
-        //db.execSQL("delete from expensetype");
-        //dbHelper.InsertDummyExpenseTypes(1,"Super Market");
-        //dbHelper.InsertDummyExpenseTypes(2,"Καύσιμα");
-        //dbHelper.InsertDummyExpenseTypes(3,"Δικά μου έξοδα");
-        //dbHelper.InsertDummyExpenseTypes(4,"Αέριο");
-        //dbHelper.InsertDummyExpenseTypes(5,"Δ.Ε.Η.");
+        //load picker
+        final Cursor cursor = db.rawQuery("SELECT  * FROM expensetype", null);
+        if(cursor.getCount()>0){
+            String[] from = new String[]{"descr"};
+            // create an array of the display item we want to bind our data to
+            int[] to = new int[]{android.R.id.text1};
+            SimpleCursorAdapter mAdapter = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item,
+                    cursor, from, to,1);
+            mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            cmbYear.setAdapter(mAdapter);
+            cmbMonth.setAdapter(mAdapter);
+
+        }
 
 
-
-        //ShowToast(dbHelper.TableRowCount("expenses").toString());
-
-        //todoCursor = db.rawQuery("SELECT  * FROM expenses order by _id desc", null);
-        //ShowToast("ROWS COUNT:"+Integer.toString(todoCursor.getCount()));
 
         // Find ListView to populate
         lvItems = (ListView) findViewById(R.id.lsvItems);

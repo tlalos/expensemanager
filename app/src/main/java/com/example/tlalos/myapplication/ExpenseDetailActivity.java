@@ -108,6 +108,21 @@ public class ExpenseDetailActivity extends AppCompatActivity  {
                 String dbField = c.getString(c.getColumnIndexOrThrow("descr"));
                 //ShowToast(Integer.toString(db_row_id)+":"+dbField);
 
+                if (editMode==0){
+                    Cursor c2= db.rawQuery("select coalesce(value,0) as lastvalue "+
+                            "from expenses where expensecodeid="+db_row_codeid+" "+
+                            "order by _id  desc limit 1 ", null);
+
+                    if(c2.getCount()>0) {
+                        c2.moveToFirst();
+                        txtValue.setText(c2.getString(c2.getColumnIndexOrThrow("lastvalue")));
+                        ShowToast("Last expense value found and suggested");
+                    }
+                    else
+                    {
+                        txtValue.setText("0");
+                    }
+                }
             }
 
             @Override

@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -16,11 +17,13 @@ public class DBHelper  extends SQLiteOpenHelper {
     public DBHelper(Context context) {
         super(context, "expenses_app2.db", null,17);
         mContext=context;
+
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         ShowToast("ON CREATE");
+
 
         try {
             db.execSQL(
@@ -38,18 +41,75 @@ public class DBHelper  extends SQLiteOpenHelper {
 
 
 
+    }
+
+    public void CheckDatabaseForUpdate() {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res=null;
+
+        try {
+            res =  db.rawQuery( "select coalesce(dbversion,0) as dbversion from param", null );
+        } catch (SQLiteException e) {
+            // Catch block
+            UpdateDatabase();
+            return;
+        }
+
+        res.moveToFirst();
+
+        Integer dbVersion=0;
+        while(res.isAfterLast() == false){
+            dbVersion=res.getInt(res.getColumnIndex("dbversion"));
+
+            res.moveToNext();
+        }
+
+        if (dbVersion<FuncHelper.AppDBVersion){
+            UpdateDatabase();
+        }
+
+
 
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        ShowToast("ON UPGRADE");
+    public void UpdateDatabase() {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+
+        ShowToast("ON UPDATE DATABASE");
         onCreate(db);
+
+
+        try {
+            db.execSQL(
+                    "create table param " +
+                            "(_id integer primary key,dbversion integer,monthlybudget real)"
+            );
+
+        } catch (SQLiteException e) {
+            // Catch block
+        }
+
 
         mCreateDBField(db,"expenses","cmonth","integer");
         mCreateDBField(db,"expenses","cyear","integer");
 
+        int paramRows=TableRowCount("param");
 
+        if (paramRows==0){
+            db.execSQL("insert into param (dbversion) values ("+FuncHelper.AppDBVersion+")");
+        }
+        else {
+            db.execSQL("update param set dbversion="+FuncHelper.AppDBVersion);
+        }
+
+
+    }
+
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
     }
 

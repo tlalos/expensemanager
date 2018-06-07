@@ -53,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
         //ShowToast("START");
         DBHelper dbHelper=new DBHelper(getApplicationContext());
         db=dbHelper.getReadableDatabase();
+        dbHelper.CheckDatabaseForUpdate();
+
 
 
         //load pickers
@@ -101,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 String cyear = c.getString(c.getColumnIndexOrThrow("cyear"));
 
                 UpdateListView();
-                ShowToast("SELECTED YEAR:"+cyear);
+                //ShowToast("SELECTED YEAR:"+cyear);
 
 
             }
@@ -126,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                 String cmonth = c.getString(c.getColumnIndexOrThrow("cmonth"));
 
                 UpdateListView();
-                ShowToast("SELECTED MONTH:"+cmonth);
+                //ShowToast("SELECTED MONTH:"+cmonth);
 
             }
 
@@ -187,6 +189,10 @@ public class MainActivity extends AppCompatActivity {
 
         String selectedYear=FuncHelper.RetSpinnerSelectedValue(cmbYear,"cyear");
         String selectedMonth=FuncHelper.RetSpinnerSelectedValue(cmbMonth,"cmonth");
+
+
+        if (selectedYear==null || selectedYear=="") selectedYear="0";
+        if (selectedMonth==null || selectedMonth=="") selectedMonth="0";
 
 
         String mSQL="SELECT e._id,e.comments,e.cdate,coalesce(e.value,0) as expensevalue,et.descr as expensedescr "+

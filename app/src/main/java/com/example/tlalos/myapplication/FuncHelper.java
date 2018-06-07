@@ -16,6 +16,9 @@ import java.util.Date;
 
 public class FuncHelper {
 
+    public static String AppVersion="1.2";
+    public static int AppDBVersion=2;
+
     public static String CurrentDate() {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat mdformat = new SimpleDateFormat("dd/MM/yyyy");

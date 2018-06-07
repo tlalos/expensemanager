@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Expense Manager</string>
 
     <string-array name="country_arrays">
         <item>Malaysia</item>

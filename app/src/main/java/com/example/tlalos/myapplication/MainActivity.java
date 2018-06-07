@@ -144,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
 
         FloatingActionButton fabAddNew;
         fabAddNew= (FloatingActionButton) findViewById(R.id.fabAddnewExpense);
+        fabAddNew.setVisibility(View.INVISIBLE);
 
         fabAddNew.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -159,6 +160,8 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+
 
 
     }
@@ -266,9 +269,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.main_menu_Favorite:
-                //newGame();
+            case R.id.main_menu_add_expense:
+                Intent intent = new Intent(mContext, ExpenseDetailActivity.class);
+                intent.putExtra("EditMode",0);
+                intent.putExtra("RecId",0);
+                startActivityForResult(intent, DETAIL_ACTIVITY_REQUEST_CODE);
                 return true;
+
             case R.id.main_menu_Settings:
                 GotoExpenseTypeAdmin();
                 return true;

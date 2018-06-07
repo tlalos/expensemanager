@@ -22,7 +22,7 @@ public class DBHelper  extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        ShowToast("ON CREATE");
+        //ShowToast("ON CREATE");
 
 
         try {
@@ -77,7 +77,7 @@ public class DBHelper  extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
 
-        ShowToast("ON UPDATE DATABASE");
+        ShowToast("DATABASE UPDATED TO VERSION "+FuncHelper.AppDBVersion);
         onCreate(db);
 
 

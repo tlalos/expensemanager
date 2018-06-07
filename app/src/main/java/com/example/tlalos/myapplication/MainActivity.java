@@ -16,8 +16,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -34,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     Spinner cmbMonth;
     SQLiteDatabase db=null;
     Context mContext;
+    TextView txtTotal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
         cmbYear= (Spinner) findViewById(R.id.cmbMainYear);
         cmbMonth= (Spinner) findViewById(R.id.cmbMainMonth);
+        txtTotal= (TextView) findViewById(R.id.txtMainTotal);
 
 
         //ShowToast("START");
@@ -185,6 +189,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    void UpdateListTotals(Cursor c) {
+        double mTotal=0;
+
+        if (c.getCount()>0){
+            c.moveToFirst();
+
+
+            while(c.isAfterLast() == false){
+
+                double value=0;
+                value=c.getDouble(c.getColumnIndex("expensevalue"));
+                mTotal+=value;
+
+                c.moveToNext();
+            }
+
+            txtTotal.setText("Total :"+mTotal+"€");
+        }
+
+    }
+
 
     void UpdateListView() {
 
@@ -209,6 +234,8 @@ public class MainActivity extends AppCompatActivity {
         todoAdapter = new TodoCursorAdapter(this, todoCursor);
         // Attach cursor adapter to the ListView
         lvItems.setAdapter(todoAdapter);
+
+        UpdateListTotals(todoCursor);
 
         } catch (SQLiteException e) {
             ShowToast(e.getMessage());

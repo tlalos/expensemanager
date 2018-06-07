@@ -16,7 +16,7 @@ import java.util.Date;
 
 public class FuncHelper {
 
-    public static String AppVersion="1.2";
+    public static String AppVersion="1.3";
     public static int AppDBVersion=4;
 
     public static String CurrentDate() {

@@ -22,6 +22,10 @@
             android:theme="@android:style/Theme.Holo.Dialog" />
         <activity android:name=".ExpenseTypeActivity" />
         <activity android:name=".ExpenseTypeCartActivity"></activity>
+
+
+
     </application>
 
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

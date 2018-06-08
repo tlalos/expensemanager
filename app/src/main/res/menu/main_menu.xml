@@ -10,4 +10,8 @@
         android:id="@+id/main_menu_Settings"
         android:icon="@android:drawable/btn_star_big_on"
         android:title="Expense Types"/>
+    <item
+        android:id="@+id/main_menu_testing"
+        android:icon="@android:drawable/btn_star_big_on"
+        android:title="Sync test"/>
 </menu>

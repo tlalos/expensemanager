@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteException;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,10 +20,28 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.tlalos.myapplication.classes.Post;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.w3c.dom.Text;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String ENDPOINT = "https://kylewbanks.com/rest/posts.json";
+    private RequestQueue requestQueue;
+    private Gson gson;
+
 
     private static final int DETAIL_ACTIVITY_REQUEST_CODE = 0;
 
@@ -44,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         getSupportActionBar().setTitle("Expenses Manager "+FuncHelper.AppVersion);
+
+
 
         //ShowToast("ONCREATE ACTIVITY");
 
@@ -306,6 +327,10 @@ public class MainActivity extends AppCompatActivity {
             case R.id.main_menu_Settings:
                 GotoExpenseTypeAdmin();
                 return true;
+            case R.id.main_menu_testing:
+                fetchPosts();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -320,4 +345,42 @@ public class MainActivity extends AppCompatActivity {
         toast.show();
 
     }
+
+
+    private void fetchPosts() {
+
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setDateFormat("M/d/yy hh:mm a");
+        gson = gsonBuilder.create();
+
+        requestQueue = Volley.newRequestQueue(this);
+
+        StringRequest request = new StringRequest(Request.Method.GET, ENDPOINT, onPostsLoaded, onPostsError);
+
+        requestQueue.add(request);
+
+    }
+
+    private final Response.Listener<String> onPostsLoaded = new Response.Listener<String>() {
+        @Override
+        public void onResponse(String response) {
+            //Log.i("PostActivity", response);
+
+            List<Post> posts = Arrays.asList(gson.fromJson(response, Post[].class));
+
+            Log.i("PostActivity", posts.size() + " posts loaded.");
+            for (Post post : posts) {
+                Log.i("PostActivity", post.ID + ": " + post.title);
+            }
+
+        }
+    };
+
+    private final Response.ErrorListener onPostsError = new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            Log.e("PostActivity", error.toString());
+        }
+    };
+
 }

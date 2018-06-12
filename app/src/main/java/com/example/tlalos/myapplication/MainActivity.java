@@ -38,7 +38,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String ENDPOINT = "https://kylewbanks.com/rest/posts.json";
+    //private static final String ENDPOINT = "https://kylewbanks.com/rest/posts.json";
+    private static final String ENDPOINT = "http://192.168.1.47:45455/api/data";
     private RequestQueue requestQueue;
     private Gson gson;
 
@@ -365,6 +366,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onResponse(String response) {
             //Log.i("PostActivity", response);
+
+            Log.i("PostActivity", response.toString() );
 
             List<Post> posts = Arrays.asList(gson.fromJson(response, Post[].class));
 

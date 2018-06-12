@@ -9,12 +9,14 @@ public class Post {
     @SerializedName("id")
     public long ID;
 
-    @SerializedName("date")
-    Date dateCreated;
+    //@SerializedName("date")
+    //Date dateCreated;
 
     public String title;
     String author;
     String url;
     String body;
+    String preview;
+    String tag;
 
 }

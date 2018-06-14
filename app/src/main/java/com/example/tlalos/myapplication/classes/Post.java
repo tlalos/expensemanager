@@ -12,11 +12,9 @@ public class Post {
     //@SerializedName("date")
     //Date dateCreated;
 
-    public String title;
-    String author;
-    String url;
-    String body;
-    String preview;
-    String tag;
+    public String code;
+    public String name;
+    public String address;
+
 
 }

@@ -38,8 +38,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    //private static final String ENDPOINT = "https://kylewbanks.com/rest/posts.json";
-    private static final String ENDPOINT = "http://192.168.1.47:45455/api/data";
+    private static final String ENDPOINT = "http://192.168.1.47:45455/api/data/getmobiledata";
     private RequestQueue requestQueue;
     private Gson gson;
 
@@ -369,12 +368,22 @@ public class MainActivity extends AppCompatActivity {
 
             Log.i("PostActivity", response.toString() );
 
-            List<Post> posts = Arrays.asList(gson.fromJson(response, Post[].class));
+            ShowToast(response.toString());
 
-            Log.i("PostActivity", posts.size() + " posts loaded.");
-            for (Post post : posts) {
-                Log.i("PostActivity", post.ID + ": " + post.title);
+            try {
+                List<Post> posts = Arrays.asList(gson.fromJson(response, Post[].class));
+
+                Log.i("PostActivity", posts.size() + " posts loaded.");
+                for (Post post : posts) {
+                    Log.i("PostActivity", post.code + ": " + post.name);
+                }
+
+            } catch (Exception e) {
+            // Catch block
+                ShowToast(e.getMessage());
+                Log.i("PostActivity", e.getMessage());
             }
+
 
         }
     };

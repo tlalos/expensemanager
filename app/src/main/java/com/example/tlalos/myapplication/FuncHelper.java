@@ -7,14 +7,26 @@ import android.database.sqlite.SQLiteException;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
+import com.google.gson.Gson;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class FuncHelper {
+
+
+    public static String ENDPOINT_ADDRESS = "http://192.168.1.47:45455";
+    public static String ENDPOINT_GETDATA = ENDPOINT_ADDRESS+"/api/data/getmobiledata";
+    public static String ENDPOINT_POSTDATA = ENDPOINT_ADDRESS+"/api/data/PostExpensesData";
+
+
 
     public static String AppVersion="1.3";
     public static int AppDBVersion=4;
@@ -159,6 +171,25 @@ public class FuncHelper {
 
     }
 
+
+
+    public static String CursorToJSON(Cursor cursor) {
+
+        cursor.moveToFirst();
+
+        Gson gson = new Gson();
+        ArrayList<Map> list = new ArrayList<>();
+        while (!cursor.isAfterLast()) {
+            Map hashMap = new HashMap();
+            for (int i = 0; i < cursor.getColumnCount(); i++) {
+                hashMap.put(cursor.getColumnName(i), cursor.getString(i));
+            }
+            list.add(hashMap);
+            cursor.moveToNext();
+        }
+        //System.out.println("\t\t\t" + gson.toJson(list));
+        return gson.toJson(list);
+    }
 
 
 }

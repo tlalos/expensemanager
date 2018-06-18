@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,25 +21,33 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.tlalos.myapplication.classes.Post;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String ENDPOINT = "http://192.168.1.47:45455/api/data/getmobiledata";
+
     private RequestQueue requestQueue;
     private Gson gson;
 
@@ -328,7 +337,11 @@ public class MainActivity extends AppCompatActivity {
                 GotoExpenseTypeAdmin();
                 return true;
             case R.id.main_menu_testing:
-                fetchPosts();
+                try {
+                    PostData();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 return true;
 
             default:
@@ -347,15 +360,172 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+
+    private void PostData() throws JSONException {
+
+        Uri myUI = Uri.parse (FuncHelper.ENDPOINT_POSTDATA).buildUpon().build();
+
+
+
+
+        Cursor c =  db.rawQuery( "select _id as id,"+
+                              "cdate,"+
+                              "coalesce(cyear,0) as cyear,"+
+                              "coalesce(cmonth,0) as cmonth,"+
+                              "coalesce(expensecodeid,0) as expensecodeid,"+
+                              "cdate as category,"+
+                              "coalesce(comments,'') as comments, "+
+                              "coalesce(value,0) as value "+
+                              "from expenses", null );
+        String jSONData=FuncHelper.CursorToJSON(c);
+        String your_string_json=jSONData;
+
+        //String your_string_json ="["+
+          //    "{Id :\"1\",Name:\"HP\",Category:\"server\",Price:\"120\"},"+
+        //"{Id :\"2\",Name:\"Router\",Category:\"networking\",Price:\"45\"}"+
+        //"]";
+
+
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+
+
+
+        JsonArrayRequest jsonobj = new JsonArrayRequest(Request.Method.POST, myUI.toString(),new JSONArray(your_string_json),
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        ShowToast("OK RESPONSE:"+response.toString());
+                        //if(mResultCallback != null){
+                        //  mResultCallback.notifySuccess(response);
+                        //}
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //if(mResultCallback != null){
+                        //  mResultCallback.notifyError(error);
+                        //}
+                        ShowToast("ERROR RESPONSE:"+error.getMessage());
+
+                    }
+                }
+        ){
+            //here I want to post data to sever
+        };
+
+
+        jsonobj.setRetryPolicy(new DefaultRetryPolicy(20 * 1000, 0,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        queue.add(jsonobj);
+
+
+
+    }
+
+
+
+
     private void fetchPosts() {
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setDateFormat("M/d/yy hh:mm a");
         gson = gsonBuilder.create();
 
+
+        Uri myUI = Uri.parse (FuncHelper.ENDPOINT_GETDATA).buildUpon()
+                .appendQueryParameter("requestcode","allcustomers")
+                .appendQueryParameter("devicecode","")
+                .appendQueryParameter("param","")
+                .build();
+
+        //Uri myUI = Uri.parse (FuncHelper.ENDPOINT_GETDATA).buildUpon()
+        //.appendQueryParameter("requestcode","singlecustomer")
+        //.appendQueryParameter("devicecode","")
+        //.appendQueryParameter("param","00-00-001")
+        //.build();
+
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, myUI.toString(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // your response
+                        Log.i("PostActivity", response.toString() );
+
+                        ShowToast(response.toString());
+
+                        try {
+                            List<Post> posts = Arrays.asList(gson.fromJson(response, Post[].class));
+
+                            Log.i("PostActivity", posts.size() + " posts loaded.");
+                            for (Post post : posts) {
+                                Log.i("PostActivity", post.code + ": " + post.name);
+                            }
+
+                        } catch (Exception e) {
+                            // Catch block
+                            ShowToast(e.getMessage());
+                            Log.i("PostActivity", e.getMessage());
+                        }
+
+
+                    }
+                }, new Response.ErrorListener() {
+
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // error
+                Log.e("PostActivity", error.toString());
+
+            }
+        }){
+            //@Override
+            //public byte[] getBody() throws AuthFailureError {
+              //  String your_string_json ="" ; // put your json
+                //return your_string_json.getBytes();
+            //}
+        };
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest);
+
+    }
+
+
+
+    private void fetchPosts2() {
+
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setDateFormat("M/d/yy hh:mm a");
+        gson = gsonBuilder.create();
+
+
+        Uri myUI = Uri.parse (FuncHelper.ENDPOINT_GETDATA).buildUpon()
+                .appendQueryParameter("requestcode","allcustomers")
+                .appendQueryParameter("devicecode","")
+                .appendQueryParameter("param","")
+                .build();
+
+        //Uri myUI = Uri.parse (FuncHelper.ENDPOINT_GETDATA).buildUpon()
+                //.appendQueryParameter("requestcode","singlecustomer")
+                //.appendQueryParameter("devicecode","")
+                //.appendQueryParameter("param","00-00-001")
+                //.build();
+
+
         requestQueue = Volley.newRequestQueue(this);
 
-        StringRequest request = new StringRequest(Request.Method.GET, ENDPOINT, onPostsLoaded, onPostsError);
+
+        StringRequest request = new StringRequest(Request.Method.GET, myUI.toString(), onPostsLoaded, onPostsError);
+
 
         requestQueue.add(request);
 
@@ -394,5 +564,9 @@ public class MainActivity extends AppCompatActivity {
             Log.e("PostActivity", error.toString());
         }
     };
+
+
+
+
 
 }

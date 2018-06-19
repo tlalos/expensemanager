@@ -114,6 +114,7 @@ public class ExpenseTypeActivity extends AppCompatActivity {
 
             String mSQL="SELECT e._id,e.descr,e.codeid "+
                     "FROM expensetype e "+
+                    "where coalesce(e.deleted,0)=0 " +
                     "order by e.codeid desc";
             expenseTypeCursor = db.rawQuery(mSQL, null);
             expenseTypeAdapter = new ExpenseTypeAdapter(this, expenseTypeCursor );

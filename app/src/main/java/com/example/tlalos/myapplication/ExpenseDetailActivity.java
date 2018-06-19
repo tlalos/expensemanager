@@ -85,7 +85,7 @@ public class ExpenseDetailActivity extends AppCompatActivity  {
 
 
         //load picker
-        final Cursor cursor = db.rawQuery("SELECT  * FROM expensetype", null);
+        final Cursor cursor = db.rawQuery("SELECT  * FROM expensetype where coalesce(deleted,0)=0", null);
         if(cursor.getCount()>0){
             String[] from = new String[]{"descr"};
             // create an array of the display item we want to bind our data to
@@ -178,7 +178,7 @@ public class ExpenseDetailActivity extends AppCompatActivity  {
 
 
     void mDelete() {
-        db.execSQL("delete from expenses where _id="+recId);
+        db.execSQL("update expenses set deleted=1,synced=0 where _id="+recId);
 
         ShowToast("Expense deleted successfully");
         Intent intent = new Intent();
@@ -267,14 +267,15 @@ public class ExpenseDetailActivity extends AppCompatActivity  {
                      "cmonth='"+mMonth+"',"+
                      "expensecodeid='"+mExpendId+"',"+
                      "value='"+txtValue.getText()+"',"+
-                     "comments='"+txtComments.getText()+"' "+
+                     "comments='"+txtComments.getText()+"',"+
+                     "synced='0' "+
                      "where _id="+recId;
             }
             else // new mode
             {
 
                 mSQL="insert into expenses " +
-                        "(cdate,cyear,cmonth,expensecodeid,value, comments) "+
+                        "(cdate,cyear,cmonth,expensecodeid,value, comments,synced,guid) "+
                         "values "+
                         "("+
                         "'"+txtDate.getText()+"'," +
@@ -282,7 +283,9 @@ public class ExpenseDetailActivity extends AppCompatActivity  {
                         "'"+mMonth+"'," +
                         "'"+mExpendId+"'," +
                         "'"+txtValue.getText()+"'," +
-                        "'"+txtComments.getText()+"'" +
+                        "'"+txtComments.getText()+"'," +
+                        "'0'," +
+                        "lower(hex(randomblob(16)))" +
                         ")";
             }
 

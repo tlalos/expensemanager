@@ -95,6 +95,13 @@ public class DBHelper  extends SQLiteOpenHelper {
         mCreateDBField(db,"expenses","cmonth","integer");
         mCreateDBField(db,"expenses","cyear","integer");
 
+        mCreateDBField(db,"expenses","guid","text");
+        mCreateDBField(db,"expenses","synced","integer");
+        mCreateDBField(db,"expenses","deleted","integer");
+
+        mCreateDBField(db,"expensetype","deleted","integer");
+
+
         int paramRows=TableRowCount("param");
 
         if (paramRows==0){

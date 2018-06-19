@@ -205,7 +205,8 @@ public class ExpenseTypeCartActivity extends AppCompatActivity {
 
 
     void mDelete() {
-        db.execSQL("delete from expensetype where _id="+recId);
+        //db.execSQL("delete from expensetype where _id="+recId);
+        db.execSQL("update expensetype set deleted=1 where _id="+recId);
 
         ShowToast("Expense Type deleted successfully");
         Intent intent = new Intent();

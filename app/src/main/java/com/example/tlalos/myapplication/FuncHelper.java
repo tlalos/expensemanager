@@ -29,8 +29,8 @@ public class FuncHelper {
 
 
 
-    public static String AppVersion="1.3";
-    public static int AppDBVersion=4;
+    public static String AppVersion="1.7";
+    public static int AppDBVersion=8;
 
     public static String CurrentDate() {
         Calendar calendar = Calendar.getInstance();

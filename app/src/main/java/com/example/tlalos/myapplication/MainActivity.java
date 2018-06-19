@@ -33,6 +33,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.tlalos.myapplication.classes.Expense;
 import com.example.tlalos.myapplication.classes.Post;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -217,9 +218,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void LoadPickers() {
-        FuncHelper.LoadSpinner(cmbYear,this,"SELECT _id,cyear FROM expenses group by cyear order by cyear desc","cyear");
+        FuncHelper.LoadSpinner(cmbYear,this,"SELECT _id,cyear FROM expenses where coalesce(deleted,0)=0 group by cyear order by cyear desc","cyear");
 
-        FuncHelper.LoadSpinner(cmbMonth,this,"SELECT _id,cmonth FROM expenses group by cmonth order by cmonth asc","cmonth");
+        FuncHelper.LoadSpinner(cmbMonth,this,"SELECT _id,cmonth FROM expenses where coalesce(deleted,0)=0 group by cmonth order by cmonth asc","cmonth");
 
 
     }
@@ -264,7 +265,8 @@ public class MainActivity extends AppCompatActivity {
                     "left join expensetype et on et.codeid=e.expensecodeid "+
                     "where "+
                     "cyear="+selectedYear+" and "+
-                    "cmonth="+selectedMonth+" "+
+                    "cmonth="+selectedMonth+" and "+
+                    "coalesce(e.deleted,0)=0 "+
                     "order by e._id desc";
         todoCursor = db.rawQuery(mSQL, null);
         todoAdapter = new TodoCursorAdapter(this, todoCursor);
@@ -349,12 +351,47 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 return true;
+            case R.id.main_menu_updateguid:
+                UpdateNewGUIDs();
+                return true;
+
+            case R.id.main_menu_deleteall:
+                db.execSQL("delete from expenses");
+                db.execSQL("delete from expensetype");
+                UpdateListView();
+                return true;
 
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
+
+    private void UpdateNewGUIDs() {
+
+        Cursor res=null;
+
+        try {
+            res =  db.rawQuery( "select _id as id from expenses where coalesce(guid,'')=''", null );
+        } catch (SQLiteException e) {
+            // Catch block
+
+        }
+
+
+        res.moveToFirst();
+
+        while(res.isAfterLast() == false){
+          int id=res.getInt(res.getColumnIndex("id"));
+
+            db.execSQL("update expenses set guid=lower(hex(randomblob(16))) where _id="+id);
+
+            res.moveToNext();
+        }
+
+        ShowToast("GUIDs updated");
+
+    }
 
     private void ShowToast(String text) {
         Context context = getApplicationContext();
@@ -384,8 +421,11 @@ public class MainActivity extends AppCompatActivity {
                 "coalesce(expensecodeid,0) as expensecodeid,"+
                 "cdate as category,"+
                 "coalesce(comments,'') as comments, "+
-                "coalesce(value,0) as value "+
-                "from expenses", null );
+                "coalesce(value,0) as value,"+
+                "coalesce(deleted,0) as deleted,"+
+                "coalesce(guid,'') as guid "+
+                "from expenses "+
+                "where coalesce(synced,0)=0", null );
 
         String jSONData=FuncHelper.CursorToJSON(c);
         String your_string_json=jSONData;
@@ -404,6 +444,15 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONArray response) {
                         ShowToast("OK RESPONSE:"+response.toString());
+
+                        //update synced flag
+                        db.execSQL("update expenses set synced=1 where coalesce(synced,0)=0");
+
+                        //deleted any marked deleted
+                        db.execSQL("delete from expenses where coalesce(deleted,0)=1");
+
+                        //deleted any marked deleted
+                        db.execSQL("delete from expensetype where coalesce(deleted,0)=1");
 
                         try {
                             PostData_ExpenseTypes();
@@ -446,7 +495,8 @@ public class MainActivity extends AppCompatActivity {
 
         Cursor c =  db.rawQuery( "select _id as id,"+
                 "codeid,"+
-                "coalesce(descr,'') as descr "+
+                "coalesce(descr,'') as descr,"+
+                "coalesce(deleted,0) as deleted "+
                 "from expensetype", null );
 
         String jSONData=FuncHelper.CursorToJSON(c);
@@ -463,6 +513,10 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONArray response) {
                         ShowToast("OK RESPONSE:"+response.toString());
+
+                        //get posts
+                        fetchPosts();
+
                         //if(mResultCallback != null){
                         //  mResultCallback.notifySuccess(response);
                         //}
@@ -506,16 +560,10 @@ public class MainActivity extends AppCompatActivity {
 
 
         Uri myUI = Uri.parse (FuncHelper.ENDPOINT_GETDATA).buildUpon()
-                .appendQueryParameter("requestcode","allcustomers")
+                .appendQueryParameter("requestcode","expenses")
                 .appendQueryParameter("devicecode","")
                 .appendQueryParameter("param","")
                 .build();
-
-        //Uri myUI = Uri.parse (FuncHelper.ENDPOINT_GETDATA).buildUpon()
-        //.appendQueryParameter("requestcode","singlecustomer")
-        //.appendQueryParameter("devicecode","")
-        //.appendQueryParameter("param","00-00-001")
-        //.build();
 
 
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -530,19 +578,24 @@ public class MainActivity extends AppCompatActivity {
 
                         ShowToast(response.toString());
 
-                        try {
-                            List<Post> posts = Arrays.asList(gson.fromJson(response, Post[].class));
+                        List<Expense> expenses= Arrays.asList(gson.fromJson(response, Expense[].class));
 
-                            Log.i("PostActivity", posts.size() + " posts loaded.");
-                            for (Post post : posts) {
-                                Log.i("PostActivity", post.code + ": " + post.name);
-                            }
+                        //update expenses
+                        UpdateExpensesFromSync(expenses);
 
-                        } catch (Exception e) {
-                            // Catch block
-                            ShowToast(e.getMessage());
-                            Log.i("PostActivity", e.getMessage());
-                        }
+                        //try {
+                          //  List<Expense> expenses= Arrays.asList(gson.fromJson(response, Expense[].class));
+
+                            //Log.i("PostActivity", expenses.size() + " expense loaded.");
+                            //for (Expense expense: expenses) {
+                              //  Log.i("PostActivity", expense.cdate+ ": " + expense.expensedescr+ " "+ expense.guid);
+                            //}
+
+                        //} catch (Exception e) {
+                          //  // Catch block
+                            //ShowToast(e.getMessage());
+                            //Log.i("PostActivity", e.getMessage());
+                        //}
 
 
                     }
@@ -568,6 +621,98 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+    private void UpdateExpensesFromSync(List<Expense> expenses) {
+
+
+        try {
+
+            for (Expense expense: expenses) {
+
+                String mSQL="SELECT e.guid "+
+                        "FROM expenses e "+
+                        "where guid='"+expense.guid+"'";
+                Cursor c= db.rawQuery(mSQL, null);
+
+                Boolean insertNew=false;
+                if (c.getCount()>0)
+                    insertNew = false;
+                else
+                    insertNew=true;
+
+                if (insertNew){ //insert new
+
+                    String mSQLInsert;
+                    mSQLInsert="insert into expenses " +
+                            "(cdate,cyear,cmonth,expensecodeid,value, comments,synced,guid) "+
+                            "values "+
+                            "("+
+                            "'"+expense.cdate+"'," +
+                            "'"+expense.cyear+"'," +
+                            "'"+expense.cmonth+"'," +
+                            "'"+ expense.expensecodeid+"'," +
+                            "'"+ expense.value+"'," +
+                            "'"+expense.comments+"'," +
+                            "'1'," +
+                            "'"+expense.guid+"'" +
+                            ")";
+                    db.execSQL(mSQLInsert);
+
+                }
+
+
+                //expensetype
+                mSQL="SELECT et.codeid "+
+                      "FROM expensetype et "+
+                      "where et.codeid='"+expense.expensecodeid+"'";
+                Cursor ctype= db.rawQuery(mSQL, null);
+
+                Boolean insertNewType=false;
+                if (ctype.getCount()>0)
+                    insertNewType= false;
+                else
+                    insertNewType=true;
+
+                if (insertNewType) {
+
+                    mSQL="insert into expensetype "+
+                         "(codeid,descr) "+
+                         "values "+
+                         "(" +
+                         "'"+expense.expensecodeid+"',"+
+                         "'"+expense.expensedescr+"' "+
+                         ")";
+                    db.execSQL(mSQL);
+                }
+
+
+            }
+
+
+            //loadpickers and listview
+            bypassComboYearOnSelect=true;
+            bypassComboMonthOnSelect=true;
+            //keep old values
+            String pyear=FuncHelper.RetSpinnerSelectedValue(cmbYear,"cyear");
+            String pmonth=FuncHelper.RetSpinnerSelectedValue(cmbMonth,"cmonth");
+            //load pickers
+            LoadPickers();
+
+
+            FuncHelper.SetSpinnerSelectedValue(cmbYear,"cyear",pyear);
+            FuncHelper.SetSpinnerSelectedValue(cmbMonth,"cmonth",pmonth);
+
+
+            UpdateListView();
+
+
+        } catch (Exception e) {
+            // Catch block
+            ShowToast(e.getMessage());
+            Log.i("PostActivity", e.getMessage());
+        }
+
+    }
 
     private void fetchPosts2() {
 

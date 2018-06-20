@@ -17,7 +17,11 @@
     <item
         android:id="@+id/main_menu_deleteall"
         android:icon="@android:drawable/btn_star_big_on"
-        android:title="Delete All Expneses"/>
+        android:title="Delete All Expenses"/>
+    <item
+        android:id="@+id/main_menu_testprogress"
+        android:icon="@android:drawable/btn_star_big_on"
+        android:title="Show Progress"/>
     <item
         android:id="@+id/main_menu_testing"
         android:icon="@android:drawable/btn_star_big_on"

@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.tlalos.myapplication">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -20,12 +22,14 @@
         <activity
             android:name=".AlertActivity"
             android:theme="@android:style/Theme.Holo.Dialog" />
+
+        <activity
+            android:name=".ProgressActivity"
+            android:theme="@android:style/Theme.Holo.Dialog" />
+
         <activity android:name=".ExpenseTypeActivity" />
-        <activity android:name=".ExpenseTypeCartActivity"></activity>
-
-
+        <activity android:name=".ExpenseTypeCartActivity" />
 
     </application>
 
-    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

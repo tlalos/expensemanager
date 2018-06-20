@@ -34,10 +34,12 @@ import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.tlalos.myapplication.classes.Expense;
+import com.example.tlalos.myapplication.classes.MessageEvent;
 import com.example.tlalos.myapplication.classes.Post;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -361,9 +363,20 @@ public class MainActivity extends AppCompatActivity {
                 UpdateListView();
                 return true;
 
+            case R.id.main_menu_testprogress:
+                ShowProgressDialog();
+
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+
+    private void ShowProgressDialog() {
+        Intent intent = new Intent(mContext, ProgressActivity.class);
+        intent.putExtra("Message","Delete Expense ?");
+        //startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
+        startActivity(intent);
     }
 
 
@@ -405,11 +418,14 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void doPostDataProcess() throws JSONException {
+        ShowProgressDialog();
         PostData_Expenses();
     }
 
 
     private void PostData_Expenses() throws JSONException {
+
+        EventBus.getDefault().post(new MessageEvent("Synchronizing expenses to cloud...",0));
 
         Uri myUI = Uri.parse (FuncHelper.ENDPOINT_POST_EXPENSES_DATA).buildUpon().build();
 
@@ -435,15 +451,12 @@ public class MainActivity extends AppCompatActivity {
         RequestQueue queue = Volley.newRequestQueue(this);
 
 
-
-
-
-
         JsonArrayRequest jsonobj = new JsonArrayRequest(Request.Method.POST, myUI.toString(),new JSONArray(your_string_json),
                 new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
-                        ShowToast("OK RESPONSE:"+response.toString());
+                        //ShowToast("OK RESPONSE:"+response.toString());
+
 
                         //update synced flag
                         db.execSQL("update expenses set synced=1 where coalesce(synced,0)=0");
@@ -451,8 +464,7 @@ public class MainActivity extends AppCompatActivity {
                         //deleted any marked deleted
                         db.execSQL("delete from expenses where coalesce(deleted,0)=1");
 
-                        //deleted any marked deleted
-                        db.execSQL("delete from expensetype where coalesce(deleted,0)=1");
+
 
                         try {
                             PostData_ExpenseTypes();
@@ -468,7 +480,8 @@ public class MainActivity extends AppCompatActivity {
                         //if(mResultCallback != null){
                         //  mResultCallback.notifyError(error);
                         //}
-                        ShowToast("ERROR RESPONSE:"+error.getMessage());
+                        //ShowToast("ERROR RESPONSE:"+error.getMessage());
+                        EventBus.getDefault().post(new MessageEvent("Post Expenses Error:"+error.getLocalizedMessage(),100));
 
                     }
                 }
@@ -491,6 +504,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void PostData_ExpenseTypes() throws JSONException {
 
+        EventBus.getDefault().post(new MessageEvent("Syncing expense types to cloud...",0));
+
         Uri myUI = Uri.parse (FuncHelper.ENDPOINT_POST_EXPENSETYPE_DATA).buildUpon().build();
 
         Cursor c =  db.rawQuery( "select _id as id,"+
@@ -507,28 +522,30 @@ public class MainActivity extends AppCompatActivity {
         RequestQueue queue = Volley.newRequestQueue(this);
 
 
-
         JsonArrayRequest jsonobj = new JsonArrayRequest(Request.Method.POST, myUI.toString(),new JSONArray(your_string_json),
                 new Response.Listener<JSONArray>() {
                     @Override
                     public void onResponse(JSONArray response) {
-                        ShowToast("OK RESPONSE:"+response.toString());
+                        //ShowToast("OK RESPONSE:"+response.toString());
+
+                        //deleted any marked deleted
+                        db.execSQL("delete from expensetype where coalesce(deleted,0)=1");
 
                         //get posts
-                        fetchPosts();
+                        try {
+                            fetchExpenses();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
 
-                        //if(mResultCallback != null){
-                        //  mResultCallback.notifySuccess(response);
-                        //}
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        //if(mResultCallback != null){
-                        //  mResultCallback.notifyError(error);
-                        //}
-                        ShowToast("ERROR RESPONSE:"+error.getMessage());
+
+                        //ShowToast("ERROR RESPONSE:"+error.getMessage());
+                        EventBus.getDefault().post(new MessageEvent("Post Expense Types Error:"+error.getLocalizedMessage(),100));
 
                     }
                 }
@@ -552,7 +569,9 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private void fetchPosts() {
+    private void fetchExpenses() throws JSONException {
+
+        EventBus.getDefault().post(new MessageEvent("Getting expenses from cloud...",0));
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setDateFormat("M/d/yy hh:mm a");
@@ -566,37 +585,38 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
 
+        Cursor c =  db.rawQuery( "select "+
+                "guid "+
+                "from expenses "+
+                "where "+
+                "coalesce(deleted,0)=0", null );
+
+        String jSONData=FuncHelper.CursorToJSON(c);
+        String your_string_json=jSONData;
+
+
+
+
+
         RequestQueue queue = Volley.newRequestQueue(this);
 
         // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, myUI.toString(),
-                new Response.Listener<String>() {
+        JsonArrayRequest stringRequest = new JsonArrayRequest (Request.Method.POST, myUI.toString(),new JSONArray(your_string_json),
+                new Response.Listener<JSONArray>() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(JSONArray response) {
                         // your response
-                        Log.i("PostActivity", response.toString() );
+                        //Log.i("PostActivity", response.toString() );
 
-                        ShowToast(response.toString());
+                        //ShowToast(response.toString());
 
-                        List<Expense> expenses= Arrays.asList(gson.fromJson(response, Expense[].class));
+                        List<Expense> expenses= Arrays.asList(gson.fromJson(response.toString(), Expense[].class));
+
 
                         //update expenses
                         UpdateExpensesFromSync(expenses);
 
-                        //try {
-                          //  List<Expense> expenses= Arrays.asList(gson.fromJson(response, Expense[].class));
-
-                            //Log.i("PostActivity", expenses.size() + " expense loaded.");
-                            //for (Expense expense: expenses) {
-                              //  Log.i("PostActivity", expense.cdate+ ": " + expense.expensedescr+ " "+ expense.guid);
-                            //}
-
-                        //} catch (Exception e) {
-                          //  // Catch block
-                            //ShowToast(e.getMessage());
-                            //Log.i("PostActivity", e.getMessage());
-                        //}
-
+                        //EventBus.getDefault().post(new MessageEvent("Synchronization finished successfully",100));
 
                     }
                 }, new Response.ErrorListener() {
@@ -605,16 +625,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 // error
-                Log.e("PostActivity", error.toString());
+                //Log.e("PostActivity", error.toString());
+                EventBus.getDefault().post(new MessageEvent("Fetch Expenses Error:"+error.getLocalizedMessage(),100));
 
             }
         }){
-            //@Override
-            //public byte[] getBody() throws AuthFailureError {
-              //  String your_string_json ="" ; // put your json
-                //return your_string_json.getBytes();
-            //}
+
         };
+
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(20 * 1000, 0,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
         // Add the request to the RequestQueue.
         queue.add(stringRequest);
 
@@ -777,6 +798,10 @@ public class MainActivity extends AppCompatActivity {
             Log.e("PostActivity", error.toString());
         }
     };
+
+
+
+
 
 
 

@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,10 +13,13 @@ import com.example.tlalos.myapplication.classes.MessageEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 public class ProgressActivity extends Activity {
 
     Button cmdClose;
+    ProgressBar pb;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +28,7 @@ public class ProgressActivity extends Activity {
         setContentView(R.layout.activity_progress);
 
         cmdClose= (Button) findViewById(R.id.cmdProgressClose);
+        pb= (ProgressBar) findViewById(R.id.prgProgress_Prog);
 
         cmdClose.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -31,10 +36,9 @@ public class ProgressActivity extends Activity {
                 finish();
             }
         });
-
     }
 
-    @Subscribe
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onEvent(MessageEvent event) {
         TextView txt;
         txt= (TextView) findViewById(R.id.lblProgressMessage);
@@ -63,6 +67,7 @@ public class ProgressActivity extends Activity {
     public void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
+
     }
 
 

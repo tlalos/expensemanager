@@ -45,6 +45,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -243,8 +244,10 @@ public class MainActivity extends AppCompatActivity {
 
                 c.moveToNext();
             }
+            DecimalFormat df2 = new DecimalFormat(".##");
 
-            txtTotal.setText("Total :"+mTotal+"€");
+
+            txtTotal.setText("Total :"+df2.format(mTotal)+"€");
         }
 
     }
@@ -351,20 +354,20 @@ public class MainActivity extends AppCompatActivity {
                     doPostDataProcess();
                 } catch (JSONException e) {
                     e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
                 return true;
-            case R.id.main_menu_updateguid:
-                UpdateNewGUIDs();
-                return true;
+            //case R.id.main_menu_updateguid:
+              //  UpdateNewGUIDs();
+                //return true;
 
-            case R.id.main_menu_deleteall:
-                db.execSQL("delete from expenses");
-                db.execSQL("delete from expensetype");
-                UpdateListView();
-                return true;
+            //case R.id.main_menu_deleteall:
+              //  db.execSQL("delete from expenses");
+                //db.execSQL("delete from expensetype");
+                //UpdateListView();
+                //return true;
 
-            case R.id.main_menu_testprogress:
-                ShowProgressDialog();
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -417,7 +420,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private void doPostDataProcess() throws JSONException {
+    private void doPostDataProcess() throws JSONException, InterruptedException {
         ShowProgressDialog();
         PostData_Expenses();
     }
@@ -425,7 +428,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void PostData_Expenses() throws JSONException {
 
-        EventBus.getDefault().post(new MessageEvent("Synchronizing expenses to cloud...",0));
+        EventBus.getDefault().postSticky(new MessageEvent("Synchronizing expenses to cloud...",0));
 
         Uri myUI = Uri.parse (FuncHelper.ENDPOINT_POST_EXPENSES_DATA).buildUpon().build();
 
@@ -481,7 +484,7 @@ public class MainActivity extends AppCompatActivity {
                         //  mResultCallback.notifyError(error);
                         //}
                         //ShowToast("ERROR RESPONSE:"+error.getMessage());
-                        EventBus.getDefault().post(new MessageEvent("Post Expenses Error:"+error.getLocalizedMessage(),100));
+                        EventBus.getDefault().postSticky(new MessageEvent("Post Expenses Error:"+error.getLocalizedMessage(),100));
 
                     }
                 }
@@ -504,7 +507,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void PostData_ExpenseTypes() throws JSONException {
 
-        EventBus.getDefault().post(new MessageEvent("Syncing expense types to cloud...",0));
+        EventBus.getDefault().postSticky(new MessageEvent("Syncing expense types to cloud...",0));
 
         Uri myUI = Uri.parse (FuncHelper.ENDPOINT_POST_EXPENSETYPE_DATA).buildUpon().build();
 
@@ -545,7 +548,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
 
                         //ShowToast("ERROR RESPONSE:"+error.getMessage());
-                        EventBus.getDefault().post(new MessageEvent("Post Expense Types Error:"+error.getLocalizedMessage(),100));
+                        EventBus.getDefault().postSticky(new MessageEvent("Post Expense Types Error:"+error.getLocalizedMessage(),100));
 
                     }
                 }
@@ -571,7 +574,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void fetchExpenses() throws JSONException {
 
-        EventBus.getDefault().post(new MessageEvent("Getting expenses from cloud...",0));
+        EventBus.getDefault().postSticky(new MessageEvent("Getting expenses from cloud...",0));
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setDateFormat("M/d/yy hh:mm a");
@@ -616,7 +619,7 @@ public class MainActivity extends AppCompatActivity {
                         //update expenses
                         UpdateExpensesFromSync(expenses);
 
-                        //EventBus.getDefault().post(new MessageEvent("Synchronization finished successfully",100));
+                        EventBus.getDefault().postSticky(new MessageEvent("Synchronization finished successfully",100));
 
                     }
                 }, new Response.ErrorListener() {
@@ -626,7 +629,7 @@ public class MainActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 // error
                 //Log.e("PostActivity", error.toString());
-                EventBus.getDefault().post(new MessageEvent("Fetch Expenses Error:"+error.getLocalizedMessage(),100));
+                EventBus.getDefault().postSticky(new MessageEvent("Fetch Expenses Error:"+error.getLocalizedMessage(),100));
 
             }
         }){

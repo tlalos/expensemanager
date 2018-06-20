@@ -11,19 +11,7 @@
         android:icon="@android:drawable/btn_star_big_on"
         android:title="Expense Types"/>
     <item
-        android:id="@+id/main_menu_updateguid"
-        android:icon="@android:drawable/btn_star_big_on"
-        android:title="Update GUIDs"/>
-    <item
-        android:id="@+id/main_menu_deleteall"
-        android:icon="@android:drawable/btn_star_big_on"
-        android:title="Delete All Expenses"/>
-    <item
-        android:id="@+id/main_menu_testprogress"
-        android:icon="@android:drawable/btn_star_big_on"
-        android:title="Show Progress"/>
-    <item
         android:id="@+id/main_menu_testing"
         android:icon="@android:drawable/btn_star_big_on"
-        android:title="Sync test"/>
+        android:title="Synchronize to Cloud"/>
 </menu>

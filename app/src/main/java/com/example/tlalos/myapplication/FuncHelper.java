@@ -29,7 +29,7 @@ public class FuncHelper {
 
 
 
-    public static String AppVersion="1.7";
+    public static String AppVersion="1.9";
     public static int AppDBVersion=8;
 
     public static String CurrentDate() {

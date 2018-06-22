@@ -358,6 +358,11 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 return true;
+
+            case R.id.main_menu_markunsynced:
+              db.execSQL("update expenses set synced=0");
+              return true;
+
             //case R.id.main_menu_updateguid:
               //  UpdateNewGUIDs();
                 //return true;

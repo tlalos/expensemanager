@@ -22,15 +22,15 @@ import java.util.Map;
 public class FuncHelper {
 
 
-    public static String ENDPOINT_ADDRESS = "http://192.168.1.47:45455";
-    //public static String ENDPOINT_ADDRESS = "http://191.101.23.235/webapi";
+   // public static String ENDPOINT_ADDRESS = "http://192.168.1.47:45455";
+    public static String ENDPOINT_ADDRESS = "http://191.101.23.235/webapi";
     public static String ENDPOINT_GETDATA = ENDPOINT_ADDRESS+"/api/data/getmobiledata";
     public static String ENDPOINT_POST_EXPENSES_DATA = ENDPOINT_ADDRESS+"/api/data/PostExpensesData";
     public static String ENDPOINT_POST_EXPENSETYPE_DATA = ENDPOINT_ADDRESS+"/api/data/PostExpenseTypeData";
 
 
 
-    public static String AppVersion="1.9";
+    public static String AppVersion="1.10";
     public static int AppDBVersion=8;
 
     public static String CurrentDate() {

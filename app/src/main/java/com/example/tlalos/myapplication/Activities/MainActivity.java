@@ -7,14 +7,17 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -41,6 +44,8 @@ import com.google.gson.GsonBuilder;
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
@@ -61,12 +66,19 @@ public class MainActivity extends AppCompatActivity {
     private Boolean bypassComboYearOnSelect=false;
     private Boolean bypassComboMonthOnSelect=false;
 
+    private AlertDialog.Builder dialogBuilder;
+    private AlertDialog dialog;
+
     ListView lvItems;
     Spinner cmbYear;
     Spinner cmbMonth;
     SQLiteDatabase db=null;
     Context mContext;
     TextView txtTotal;
+
+    private Button cmdProgressClose;
+    private TextView txtProgressMessage;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -373,10 +385,30 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void ShowProgressDialog() {
-        Intent intent = new Intent(mContext, ProgressActivity.class);
-        intent.putExtra("Message","Delete Expense ?");
-        //startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
-        startActivity(intent);
+        //OLD WAY AS INTENT
+        //Intent intent = new Intent(mContext, ProgressActivity.class);
+        //intent.putExtra("Message","Delete Expense ?");
+        //startActivity(intent);
+
+        dialogBuilder=new AlertDialog.Builder(this);
+        View view= getLayoutInflater().inflate(R.layout.activity_progress,null);
+
+        cmdProgressClose=(Button) view.findViewById(R.id.cmdProgressClose);
+        txtProgressMessage=(TextView) view.findViewById(R.id.lblProgressMessage);
+
+
+        dialogBuilder.setView(view);
+        dialog=dialogBuilder.create();
+        dialog.show();
+
+
+        cmdProgressClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
     }
 
 
@@ -425,7 +457,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void PostData_Expenses() throws JSONException {
 
-        EventBus.getDefault().postSticky(new MessageEvent("Synchronizing expenses to cloud...",0));
+        //EventBus.getDefault().postSticky(new MessageEvent("Synchronizing expenses to cloud...",0));
+        txtProgressMessage.setText("Synchronizing expenses to cloud...");
 
         Uri myUI = Uri.parse (Util.ENDPOINT_POST_EXPENSES_DATA).buildUpon().build();
 
@@ -456,32 +489,54 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONArray response) {
                         //ShowToast("OK RESPONSE:"+response.toString());
-
-
-                        //update synced flag
-                        db.execSQL("update expenses set synced=1 where coalesce(synced,0)=0");
-
-                        //deleted any marked deleted
-                        db.execSQL("delete from expenses where coalesce(deleted,0)=1");
-
-
-
                         try {
-                            PostData_ExpenseTypes();
+
+                            //JSONObject jsonObjectResult = response.getJSONObject(0);
+                            //String rescode=jsonObjectResult.getString("result").toLowerCase();
+                            String rescode=response.getJSONObject(0).getString("result").toLowerCase();
+                            String resDescr=response.getJSONObject(1).getString("resultdescr").toLowerCase();;
+                            //ShowToast(rescode);
+
+                            if (rescode.equals("error")) {
+                                //EventBus.getDefault().postSticky(new MessageEvent("Post Expenses Error:"+resDescr,100));
+                                txtProgressMessage.setText("Post Expenses Error:"+resDescr);
+                                cmdProgressClose.setEnabled(true);
+                                //ShowToast(resDescr);
+
+                            }
+                            else {
+
+                                //update synced flag
+                                db.execSQL("update expenses set synced=1 where coalesce(synced,0)=0");
+
+                                //deleted any marked deleted
+                                db.execSQL("delete from expenses where coalesce(deleted,0)=1");
+
+
+
+                                try {
+                                    PostData_ExpenseTypes();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+
+
 
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        //if(mResultCallback != null){
-                        //  mResultCallback.notifyError(error);
-                        //}
-                        //ShowToast("ERROR RESPONSE:"+error.getMessage());
-                        EventBus.getDefault().postSticky(new MessageEvent("Post Expenses Error:"+error.getLocalizedMessage(),100));
+
+                        //EventBus.getDefault().postSticky(new MessageEvent("Post Expenses Error:"+error.getLocalizedMessage(),100));
+                        txtProgressMessage.setText("Post Expenses Error:"+error.getLocalizedMessage());
+                        cmdProgressClose.setEnabled(true);
 
                     }
                 }
@@ -504,7 +559,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void PostData_ExpenseTypes() throws JSONException {
 
-        EventBus.getDefault().postSticky(new MessageEvent("Syncing expense types to cloud...",0));
+        //EventBus.getDefault().postSticky(new MessageEvent("Syncing expense types to cloud...",0));
+        txtProgressMessage.setText("Syncing expense types to cloud...");
 
         Uri myUI = Uri.parse (Util.ENDPOINT_POST_EXPENSETYPE_DATA).buildUpon().build();
 
@@ -545,7 +601,9 @@ public class MainActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
 
                         //ShowToast("ERROR RESPONSE:"+error.getMessage());
-                        EventBus.getDefault().postSticky(new MessageEvent("Post Expense Types Error:"+error.getLocalizedMessage(),100));
+                        //EventBus.getDefault().postSticky(new MessageEvent("Post Expense Types Error:"+error.getLocalizedMessage(),100));
+                        txtProgressMessage.setText("Post Expense Types Error:"+error.getLocalizedMessage());
+                        cmdProgressClose.setEnabled(true);
 
                     }
                 }
@@ -571,7 +629,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void fetchExpenses() throws JSONException {
 
-        EventBus.getDefault().postSticky(new MessageEvent("Getting expenses from cloud...",0));
+        //EventBus.getDefault().postSticky(new MessageEvent("Getting expenses from cloud...",0));
+        txtProgressMessage.setText("Getting expenses from cloud...");
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setDateFormat("M/d/yy hh:mm a");
@@ -616,7 +675,9 @@ public class MainActivity extends AppCompatActivity {
                         //update expenses
                         UpdateExpensesFromSync(expenses);
 
-                        EventBus.getDefault().postSticky(new MessageEvent("Synchronization finished successfully",100));
+                        //EventBus.getDefault().postSticky(new MessageEvent("Synchronization finished successfully",100));
+                        txtProgressMessage.setText("Synchronization finished successfully");
+                        cmdProgressClose.setEnabled(true);
 
                     }
                 }, new Response.ErrorListener() {
@@ -626,7 +687,9 @@ public class MainActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 // error
                 //Log.e("PostActivity", error.toString());
-                EventBus.getDefault().postSticky(new MessageEvent("Fetch Expenses Error:"+error.getLocalizedMessage(),100));
+                //EventBus.getDefault().postSticky(new MessageEvent("Fetch Expenses Error:"+error.getLocalizedMessage(),100));
+                txtProgressMessage.setText("Fetch Expenses Error:"+error.getLocalizedMessage());
+                cmdProgressClose.setEnabled(true);
 
             }
         }){

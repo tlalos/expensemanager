@@ -18,6 +18,7 @@
         android:layout_marginTop="8dp"
         android:gravity="center_vertical"
         android:text="Message.."
+        android:textColor="@android:color/black"
         android:textSize="17sp"
         app:layout_constraintBottom_toTopOf="@+id/cmdProgressClose"
         app:layout_constraintEnd_toEndOf="parent"

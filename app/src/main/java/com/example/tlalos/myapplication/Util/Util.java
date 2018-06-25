@@ -28,7 +28,7 @@ public class Util {
 
 
 
-    public static String AppVersion="1.10";
+    public static String AppVersion="1.11";
     public static int AppDBVersion=8;
 
     public static String CurrentDate() {

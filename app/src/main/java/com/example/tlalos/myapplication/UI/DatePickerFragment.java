@@ -1,4 +1,4 @@
-package com.example.tlalos.myapplication;
+package com.example.tlalos.myapplication.UI;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;

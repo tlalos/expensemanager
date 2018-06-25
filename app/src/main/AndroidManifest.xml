@@ -11,24 +11,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".Activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ExpenseDetailActivity" />
+        <activity android:name=".Activities.ExpenseDetailActivity" />
         <activity
-            android:name=".AlertActivity"
+            android:name=".Activities.AlertActivity"
             android:theme="@android:style/Theme.Holo.Dialog" />
 
         <activity
-            android:name=".ProgressActivity"
+            android:name=".Activities.ProgressActivity"
             android:theme="@android:style/Theme.Holo.Dialog" />
 
-        <activity android:name=".ExpenseTypeActivity" />
-        <activity android:name=".ExpenseTypeCartActivity" />
+        <activity android:name=".Activities.ExpenseTypeActivity" />
+        <activity android:name=".Activities.ExpenseTypeCartActivity" />
 
     </application>
 

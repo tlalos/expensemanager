@@ -1,11 +1,10 @@
-package com.example.tlalos.myapplication;
+package com.example.tlalos.myapplication.Activities;
 
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -16,7 +15,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.util.Calendar;
+import com.example.tlalos.myapplication.Data.DBHelper;
+import com.example.tlalos.myapplication.R;
 
 public class ExpenseTypeCartActivity extends AppCompatActivity {
 

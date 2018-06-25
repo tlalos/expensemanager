@@ -1,12 +1,14 @@
-package com.example.tlalos.myapplication;
+package com.example.tlalos.myapplication.Data;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 import android.widget.Toast;
+
+import com.example.tlalos.myapplication.Util.FuncHelper;
+import com.example.tlalos.myapplication.Util.Util;
 
 import java.util.ArrayList;
 
@@ -65,7 +67,7 @@ public class DBHelper  extends SQLiteOpenHelper {
             res.moveToNext();
         }
 
-        if (dbVersion<FuncHelper.AppDBVersion){
+        if (dbVersion< Util.AppDBVersion){
             UpdateDatabase();
         }
 
@@ -77,7 +79,7 @@ public class DBHelper  extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
 
-        ShowToast("DATABASE UPDATED TO VERSION "+FuncHelper.AppDBVersion);
+        ShowToast("DATABASE UPDATED TO VERSION "+Util.AppDBVersion);
         onCreate(db);
 
 
@@ -105,10 +107,10 @@ public class DBHelper  extends SQLiteOpenHelper {
         int paramRows=TableRowCount("param");
 
         if (paramRows==0){
-            db.execSQL("insert into param (dbversion) values ("+FuncHelper.AppDBVersion+")");
+            db.execSQL("insert into param (dbversion) values ("+Util.AppDBVersion+")");
         }
         else {
-            db.execSQL("update param set dbversion="+FuncHelper.AppDBVersion);
+            db.execSQL("update param set dbversion="+Util.AppDBVersion);
         }
 
 

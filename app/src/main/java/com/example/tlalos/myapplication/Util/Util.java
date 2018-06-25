@@ -1,12 +1,12 @@
-package com.example.tlalos.myapplication;
+package com.example.tlalos.myapplication.Util;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
+import com.example.tlalos.myapplication.Data.DBHelper;
 import com.google.gson.Gson;
 
 import java.text.DateFormat;
@@ -18,11 +18,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+public class Util {
 
-public class FuncHelper {
-
-
-   // public static String ENDPOINT_ADDRESS = "http://192.168.1.47:45455";
+    // public static String ENDPOINT_ADDRESS = "http://192.168.1.47:45455";
     public static String ENDPOINT_ADDRESS = "http://191.101.23.235/webapi";
     public static String ENDPOINT_GETDATA = ENDPOINT_ADDRESS+"/api/data/getmobiledata";
     public static String ENDPOINT_POST_EXPENSES_DATA = ENDPOINT_ADDRESS+"/api/data/PostExpensesData";
@@ -115,7 +113,7 @@ public class FuncHelper {
     }
 
 
-    public static SimpleCursorAdapter LoadSpinner(Spinner Picker, Context mContext,String mQuery,String mViewField) {
+    public static SimpleCursorAdapter LoadSpinner(Spinner Picker, Context mContext, String mQuery, String mViewField) {
 
         DBHelper dbHelper=new DBHelper(mContext);
         SQLiteDatabase db=dbHelper.getReadableDatabase();
@@ -146,7 +144,7 @@ public class FuncHelper {
         try {
             Cursor cursor = (Cursor) mSpinner.getSelectedItem();
             val = cursor.getString(cursor.getColumnIndex(mField));
-            } catch (Exception e) {
+        } catch (Exception e) {
             // Catch block
         }
 
@@ -192,6 +190,4 @@ public class FuncHelper {
         //System.out.println("\t\t\t" + gson.toJson(list));
         return gson.toJson(list);
     }
-
-
 }

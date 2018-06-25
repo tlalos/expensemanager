@@ -1,6 +1,5 @@
-package com.example.tlalos.myapplication;
+package com.example.tlalos.myapplication.Activities;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -17,42 +16,36 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.tlalos.myapplication.classes.Expense;
-import com.example.tlalos.myapplication.classes.MessageEvent;
-import com.example.tlalos.myapplication.classes.Post;
+import com.example.tlalos.myapplication.Data.DBHelper;
+import com.example.tlalos.myapplication.Util.FuncHelper;
+import com.example.tlalos.myapplication.Model.Expense;
+import com.example.tlalos.myapplication.Model.MessageEvent;
+import com.example.tlalos.myapplication.Model.Post;
+import com.example.tlalos.myapplication.R;
+import com.example.tlalos.myapplication.Data.TodoCursorAdapter;
+import com.example.tlalos.myapplication.Util.Util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -81,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getSupportActionBar().setTitle("Expenses Manager "+FuncHelper.AppVersion);
+        getSupportActionBar().setTitle("Expenses Manager "+ Util.AppVersion);
 
 
 
@@ -104,8 +97,8 @@ public class MainActivity extends AppCompatActivity {
         //load pickers
         LoadPickers();
 
-        FuncHelper.SetSpinnerSelectedValue(cmbYear,"cyear",Integer.toString(FuncHelper.GetCurrentYear()));
-        FuncHelper.SetSpinnerSelectedValue(cmbMonth,"cmonth",Integer.toString(FuncHelper.GetCurrentMonth()));
+        Util.SetSpinnerSelectedValue(cmbYear,"cyear",Integer.toString(Util.GetCurrentYear()));
+        Util.SetSpinnerSelectedValue(cmbMonth,"cmonth",Integer.toString(Util.GetCurrentMonth()));
 
 
 
@@ -221,9 +214,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void LoadPickers() {
-        FuncHelper.LoadSpinner(cmbYear,this,"SELECT _id,cyear FROM expenses where coalesce(deleted,0)=0 group by cyear order by cyear desc","cyear");
+        Util.LoadSpinner(cmbYear,this,"SELECT _id,cyear FROM expenses where coalesce(deleted,0)=0 group by cyear order by cyear desc","cyear");
 
-        FuncHelper.LoadSpinner(cmbMonth,this,"SELECT _id,cmonth FROM expenses where coalesce(deleted,0)=0 group by cmonth order by cmonth asc","cmonth");
+        Util.LoadSpinner(cmbMonth,this,"SELECT _id,cmonth FROM expenses where coalesce(deleted,0)=0 group by cmonth order by cmonth asc","cmonth");
 
 
     }
@@ -257,8 +250,8 @@ public class MainActivity extends AppCompatActivity {
 
         try {
 
-        String selectedYear=FuncHelper.RetSpinnerSelectedValue(cmbYear,"cyear");
-        String selectedMonth=FuncHelper.RetSpinnerSelectedValue(cmbMonth,"cmonth");
+        String selectedYear=Util.RetSpinnerSelectedValue(cmbYear,"cyear");
+        String selectedMonth=Util.RetSpinnerSelectedValue(cmbMonth,"cmonth");
 
 
         if (selectedYear==null || selectedYear=="") selectedYear="0";
@@ -304,14 +297,14 @@ public class MainActivity extends AppCompatActivity {
                 bypassComboYearOnSelect=true;
                 bypassComboMonthOnSelect=true;
                 //keep old values
-                String pyear=FuncHelper.RetSpinnerSelectedValue(cmbYear,"cyear");
-                String pmonth=FuncHelper.RetSpinnerSelectedValue(cmbMonth,"cmonth");
+                String pyear=Util.RetSpinnerSelectedValue(cmbYear,"cyear");
+                String pmonth=Util.RetSpinnerSelectedValue(cmbMonth,"cmonth");
                 //load pickers
                 LoadPickers();
 
 
-                FuncHelper.SetSpinnerSelectedValue(cmbYear,"cyear",pyear);
-                FuncHelper.SetSpinnerSelectedValue(cmbMonth,"cmonth",pmonth);
+                Util.SetSpinnerSelectedValue(cmbYear,"cyear",pyear);
+                Util.SetSpinnerSelectedValue(cmbMonth,"cmonth",pmonth);
 
                 UpdateListView();
 
@@ -435,7 +428,7 @@ public class MainActivity extends AppCompatActivity {
 
         EventBus.getDefault().postSticky(new MessageEvent("Synchronizing expenses to cloud...",0));
 
-        Uri myUI = Uri.parse (FuncHelper.ENDPOINT_POST_EXPENSES_DATA).buildUpon().build();
+        Uri myUI = Uri.parse (Util.ENDPOINT_POST_EXPENSES_DATA).buildUpon().build();
 
 
         Cursor c =  db.rawQuery( "select _id as id,"+
@@ -451,7 +444,7 @@ public class MainActivity extends AppCompatActivity {
                 "from expenses "+
                 "where coalesce(synced,0)=0", null );
 
-        String jSONData=FuncHelper.CursorToJSON(c);
+        String jSONData=Util.CursorToJSON(c);
         String your_string_json=jSONData;
 
 
@@ -514,7 +507,7 @@ public class MainActivity extends AppCompatActivity {
 
         EventBus.getDefault().postSticky(new MessageEvent("Syncing expense types to cloud...",0));
 
-        Uri myUI = Uri.parse (FuncHelper.ENDPOINT_POST_EXPENSETYPE_DATA).buildUpon().build();
+        Uri myUI = Uri.parse (Util.ENDPOINT_POST_EXPENSETYPE_DATA).buildUpon().build();
 
         Cursor c =  db.rawQuery( "select _id as id,"+
                 "codeid,"+
@@ -522,7 +515,7 @@ public class MainActivity extends AppCompatActivity {
                 "coalesce(deleted,0) as deleted "+
                 "from expensetype", null );
 
-        String jSONData=FuncHelper.CursorToJSON(c);
+        String jSONData=Util.CursorToJSON(c);
         String your_string_json=jSONData;
 
 
@@ -586,7 +579,7 @@ public class MainActivity extends AppCompatActivity {
         gson = gsonBuilder.create();
 
 
-        Uri myUI = Uri.parse (FuncHelper.ENDPOINT_GETDATA).buildUpon()
+        Uri myUI = Uri.parse (Util.ENDPOINT_GETDATA).buildUpon()
                 .appendQueryParameter("requestcode","expenses")
                 .appendQueryParameter("devicecode","")
                 .appendQueryParameter("param","")
@@ -599,7 +592,7 @@ public class MainActivity extends AppCompatActivity {
                 "where "+
                 "coalesce(deleted,0)=0", null );
 
-        String jSONData=FuncHelper.CursorToJSON(c);
+        String jSONData=Util.CursorToJSON(c);
         String your_string_json=jSONData;
 
 
@@ -722,14 +715,14 @@ public class MainActivity extends AppCompatActivity {
             bypassComboYearOnSelect=true;
             bypassComboMonthOnSelect=true;
             //keep old values
-            String pyear=FuncHelper.RetSpinnerSelectedValue(cmbYear,"cyear");
-            String pmonth=FuncHelper.RetSpinnerSelectedValue(cmbMonth,"cmonth");
+            String pyear=Util.RetSpinnerSelectedValue(cmbYear,"cyear");
+            String pmonth=Util.RetSpinnerSelectedValue(cmbMonth,"cmonth");
             //load pickers
             LoadPickers();
 
 
-            FuncHelper.SetSpinnerSelectedValue(cmbYear,"cyear",pyear);
-            FuncHelper.SetSpinnerSelectedValue(cmbMonth,"cmonth",pmonth);
+            Util.SetSpinnerSelectedValue(cmbYear,"cyear",pyear);
+            Util.SetSpinnerSelectedValue(cmbMonth,"cmonth",pmonth);
 
 
             UpdateListView();
@@ -750,7 +743,7 @@ public class MainActivity extends AppCompatActivity {
         gson = gsonBuilder.create();
 
 
-        Uri myUI = Uri.parse (FuncHelper.ENDPOINT_GETDATA).buildUpon()
+        Uri myUI = Uri.parse (Util.ENDPOINT_GETDATA).buildUpon()
                 .appendQueryParameter("requestcode","allcustomers")
                 .appendQueryParameter("devicecode","")
                 .appendQueryParameter("param","")

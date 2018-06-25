@@ -1,4 +1,4 @@
-package com.example.tlalos.myapplication;
+package com.example.tlalos.myapplication.Data;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
+
+import com.example.tlalos.myapplication.R;
 
 public class ExpenseTypeAdapter extends CursorAdapter {
     public ExpenseTypeAdapter(Context context, Cursor c) {

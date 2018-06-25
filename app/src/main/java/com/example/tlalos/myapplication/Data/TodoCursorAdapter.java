@@ -1,4 +1,4 @@
-package com.example.tlalos.myapplication;
+package com.example.tlalos.myapplication.Data;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
+
+import com.example.tlalos.myapplication.R;
 
 public class TodoCursorAdapter extends CursorAdapter {
     public TodoCursorAdapter(Context context, Cursor cursor) {

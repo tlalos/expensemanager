@@ -1,15 +1,14 @@
-package com.example.tlalos.myapplication;
+package com.example.tlalos.myapplication.Activities;
 
 import android.app.Activity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.tlalos.myapplication.classes.MessageEvent;
+import com.example.tlalos.myapplication.R;
+import com.example.tlalos.myapplication.Model.MessageEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

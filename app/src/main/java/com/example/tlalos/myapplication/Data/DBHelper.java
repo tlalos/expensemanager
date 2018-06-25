@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
-import com.example.tlalos.myapplication.Util.FuncHelper;
 import com.example.tlalos.myapplication.Util.Util;
 
 import java.util.ArrayList;

@@ -29,7 +29,6 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.tlalos.myapplication.Data.DBHelper;
-import com.example.tlalos.myapplication.Util.FuncHelper;
 import com.example.tlalos.myapplication.Model.Expense;
 import com.example.tlalos.myapplication.Model.MessageEvent;
 import com.example.tlalos.myapplication.Model.Post;
@@ -749,7 +748,7 @@ public class MainActivity extends AppCompatActivity {
                 .appendQueryParameter("param","")
                 .build();
 
-        //Uri myUI = Uri.parse (FuncHelper.ENDPOINT_GETDATA).buildUpon()
+        //Uri myUI = Uri.parse (Util.ENDPOINT_GETDATA).buildUpon()
                 //.appendQueryParameter("requestcode","singlecustomer")
                 //.appendQueryParameter("devicecode","")
                 //.appendQueryParameter("param","00-00-001")

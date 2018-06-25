@@ -19,13 +19,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activities.ExpenseDetailActivity" />
-        <activity
-            android:name=".Activities.AlertActivity"
-            android:theme="@android:style/Theme.Holo.Dialog" />
+        <activity android:name=".Activities.AlertActivity" />
 
-        <activity
-            android:name=".Activities.ProgressActivity"
-            />
+        <activity android:name=".Activities.ProgressActivity" />
 
         <activity android:name=".Activities.ExpenseTypeActivity" />
         <activity android:name=".Activities.ExpenseTypeCartActivity" />

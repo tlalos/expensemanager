@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -13,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.tlalos.myapplication.Data.DBHelper;
@@ -35,6 +37,8 @@ public class ExpenseTypeCartActivity extends AppCompatActivity {
     Context mContext;
 
 
+    private AlertDialog.Builder dialogBuilder;
+    private AlertDialog dialog;
 
 
 
@@ -82,9 +86,43 @@ public class ExpenseTypeCartActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(mContext, AlertActivity.class);
-                intent.putExtra("Message","Delete Expense Type ?");
-                startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
+                //OLD WAY WITH INTENT
+                //Intent intent = new Intent(mContext, AlertActivity.class);
+                //intent.putExtra("Message","Delete Expense Type ?");
+                //startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
+
+
+                dialogBuilder=new AlertDialog.Builder(v.getContext());
+                View view= getLayoutInflater().inflate(R.layout.activity_alert,null);
+
+
+                Button cmdAlertYes=(Button) view.findViewById(R.id.cmdAlertYes);
+                Button cmdAlertNo=(Button) view.findViewById(R.id.cmdAlertNo);
+                TextView txtAlertMessage=(TextView) view.findViewById(R.id.lblAlertMessage);
+
+                txtAlertMessage.setText("Delete Expense Type ?");
+
+
+                dialogBuilder.setView(view);
+                dialog=dialogBuilder.create();
+                dialog.show();
+
+
+                cmdAlertYes.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mDelete();
+                        dialog.dismiss();
+                    }
+                });
+
+                cmdAlertNo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+
 
             }
         });

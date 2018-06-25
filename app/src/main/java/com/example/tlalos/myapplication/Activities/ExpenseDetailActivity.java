@@ -1,11 +1,13 @@
 package com.example.tlalos.myapplication.Activities;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -17,6 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.tlalos.myapplication.Data.DBHelper;
@@ -37,6 +40,10 @@ public class ExpenseDetailActivity extends AppCompatActivity  {
     int editMode;
     long recId=0;
     Context mContext;
+
+    private AlertDialog.Builder dialogBuilder;
+    private AlertDialog dialog;
+
 
 
     private static final int ALERT_ACTIVITY_REQUEST_CODE = 0;
@@ -151,9 +158,42 @@ public class ExpenseDetailActivity extends AppCompatActivity  {
             @Override
             public void onClick(View v) {
 
-                Intent intent = new Intent(mContext, AlertActivity.class);
-                intent.putExtra("Message","Delete Expense ?");
-                startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
+                //OLD WAY WITH INTENT
+                //Intent intent = new Intent(mContext, AlertActivity.class);
+                //intent.putExtra("Message","Delete Expense ?");
+                //startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
+
+
+                dialogBuilder=new AlertDialog.Builder(v.getContext());
+                View view= getLayoutInflater().inflate(R.layout.activity_alert,null);
+
+
+                Button cmdAlertYes=(Button) view.findViewById(R.id.cmdAlertYes);
+                Button cmdAlertNo=(Button) view.findViewById(R.id.cmdAlertNo);
+                TextView txtAlertMessage=(TextView) view.findViewById(R.id.lblAlertMessage);
+
+                txtAlertMessage.setText("Delete Expense ?");
+
+
+                dialogBuilder.setView(view);
+                dialog=dialogBuilder.create();
+                dialog.show();
+
+                cmdAlertYes.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mDelete();
+                        dialog.dismiss();
+                    }
+                });
+
+                cmdAlertNo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+
 
             }
         });

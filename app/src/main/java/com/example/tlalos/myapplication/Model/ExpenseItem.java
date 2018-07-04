@@ -8,7 +8,7 @@ public class ExpenseItem {
     public ExpenseItem() {
     }
 
-    public int id;
+    public long id;
     public String cMonth;
     public int expenseCodeId;
     public String expenseDescr;

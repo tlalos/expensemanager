@@ -2,10 +2,19 @@ package com.example.tlalos.myapplication.Model;
 
 public class ExpenseListItem {
 
-    private int id;
+
+    private long id;
     private String field1;
     private String field2;
-    private float value;
+    private String value;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public String getField2() {
         return field2;
@@ -15,11 +24,11 @@ public class ExpenseListItem {
         this.field2 = field2;
     }
 
-    public float getValue() {
+    public String getValue() {
         return value;
     }
 
-    public void setValue(float value) {
+    public void setValue(String value) {
         this.value = value;
     }
 
@@ -38,7 +47,7 @@ public class ExpenseListItem {
 
     }
 
-    public ExpenseListItem(String field1,String field2,float value) {
+    public ExpenseListItem(String field1,String field2,String value) {
         this.field1=field1;
         this.field2=field2;
         this.value=value;

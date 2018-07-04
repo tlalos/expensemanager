@@ -38,7 +38,7 @@ public class DBSelectQueries {
         while(res.isAfterLast() == false){
             ExpenseItem item=new ExpenseItem();
 
-            item.id=res.getInt(res.getColumnIndex("_id"));
+            item.id=res.getLong(res.getColumnIndex("_id"));
             item.cDate=res.getString(res.getColumnIndex("cdate"));
             item.cMonth=res.getString(res.getColumnIndex("cmonth"));
             item.cYear=res.getString(res.getColumnIndex("cyear"));

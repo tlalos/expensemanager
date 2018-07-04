@@ -1,6 +1,8 @@
 package com.example.tlalos.myapplication.UI;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
@@ -11,20 +13,26 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.tlalos.myapplication.Activities.ExpenseDetailActivity;
 import com.example.tlalos.myapplication.Model.ExpenseListItem;
 import com.example.tlalos.myapplication.R;
 
 import java.util.List;
+
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
 
     private Context context;
     private List<ExpenseListItem> listitems;
 
+
     public RecyclerViewAdapter(Context context,List listitem) {
         this.context=context;
         this.listitems=listitem;
     }
+
+
+
 
     @NonNull
     @Override
@@ -42,7 +50,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         holder.field1.setText(item.getField1());
         holder.field2.setText(item.getField2());
-        holder.value.setText(Float.toString(item.getValue()));
+        holder.value.setText(item.getValue());
 
     }
 
@@ -51,7 +59,39 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return listitems.size();
     }
 
+
+    public void updateList(List<ExpenseListItem> ulist){
+        listitems.clear();
+        listitems.addAll(ulist);
+        notifyDataSetChanged();
+    }
+
+    public void updateItemToList(ExpenseListItem item){
+        int position = listitems.indexOf(item);
+        listitems.set(position,item);
+        notifyItemChanged(position);
+    }
+
+
+    public void addItemToList(ExpenseListItem item, int position) {
+        listitems.add(position, item);
+        notifyItemInserted(position);
+    }
+
+    public void removeItemFromList(ExpenseListItem item){
+        int position = listitems.indexOf(item);
+        listitems.remove(position);
+        notifyItemRemoved(position);
+    }
+
+
+
+
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+
+
+        private static final int DETAIL_ACTIVITY_REQUEST_CODE = 0;
 
         public TextView field1;
         public TextView field2;
@@ -80,8 +120,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //Toast.makeText(context,"View Clicked"+getAdapterPosition(),Toast.LENGTH_LONG).show();
-                    Snackbar.make(v,"View Clicked "+getAdapterPosition(),Snackbar.LENGTH_LONG).show();
+
+                    int position=getAdapterPosition();
+                    Snackbar.make(v,"View Clicked "+listitems.get(position).getId(),Snackbar.LENGTH_LONG).show();
+
+
+                    Intent intent = new Intent(context, ExpenseDetailActivity.class);
+                    intent.putExtra("EditMode",1);
+                    intent.putExtra("RecId",listitems.get(position).getId());
+                    ((Activity)context).startActivityForResult(intent, DETAIL_ACTIVITY_REQUEST_CODE);
+
+
                 }
             });
         }

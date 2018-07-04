@@ -20,12 +20,10 @@
         </activity>
         <activity android:name=".Activities.ExpenseDetailActivity" />
         <activity android:name=".Activities.AlertActivity" />
-
         <activity android:name=".Activities.ProgressActivity" />
-
         <activity android:name=".Activities.ExpenseTypeActivity" />
         <activity android:name=".Activities.ExpenseTypeCartActivity" />
-
+        <activity android:name=".Activities.RecyclerViewActivity"></activity>
     </application>
 
 </manifest>

@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
 
+import com.example.tlalos.myapplication.Model.Expense;
 import com.example.tlalos.myapplication.Util.Util;
 
 import java.util.ArrayList;
@@ -131,7 +132,7 @@ public class DBHelper  extends SQLiteOpenHelper {
         return true;
     }
 
-    public ArrayList<String> getAllExpenses() {
+    /*public ArrayList<String> getAllExpenses() {
         ArrayList<String> array_list = new ArrayList<String>();
 
         //hp = new HashMap();
@@ -145,7 +146,10 @@ public class DBHelper  extends SQLiteOpenHelper {
             res.moveToNext();
         }
         return array_list;
-    }
+    }*/
+
+
+
 
 
     public Integer TableRowCount(String mTableName) {

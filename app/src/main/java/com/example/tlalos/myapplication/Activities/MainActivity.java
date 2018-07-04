@@ -351,7 +351,9 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.main_menu_Settings:
-                GotoExpenseTypeAdmin();
+                //GotoExpenseTypeAdmin();
+                Intent intent2 = new Intent(mContext, RecyclerViewActivity.class);
+                startActivity(intent2);
                 return true;
             case R.id.main_menu_testing:
                 try {
